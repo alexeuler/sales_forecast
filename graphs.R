@@ -46,8 +46,8 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 
 
 general_graphs = function(source_data){
-  p1 = ggplot(source_data, aes(x = week, y=count, group=year, colour=year)) + geom_line()  + theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
-  p2 = ggplot(source_data, aes(x = week, y=count)) + geom_boxplot() + theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  p1 = ggplot(source_data, aes(x = factor(week), y=count, group=year, colour=year)) + geom_line()  + theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  p2 = ggplot(source_data, aes(x = factor(week), y=count)) + geom_boxplot() + theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
   p3 = ggplot(cust_weekly, aes(x=date, y=count)) + geom_line() + theme_bw() + stat_smooth()
   multiplot(p1,p2,p3,cols=2)
   
