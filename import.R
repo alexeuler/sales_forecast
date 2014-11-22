@@ -1,6 +1,5 @@
-
 df = readWorksheetFromFile(file = "Shop Figures v8.xlsx", sheet = "Takings", endCol = 13)
-df$Date = df$Date + 3600 #This is weird - the date from excel is read as previous day 23:00, to fix that we add 3 600 sec
+df$Date = as.Date(df$Date + 3600) #This is weird - the date from excel is read as previous day 23:00, to fix that we add 3 600 sec
 df$Weekday = strftime(df$Date,'%w')
 df$Year = strftime(df$Date,'%Y')
 #Year 2007 is incomplete
@@ -30,8 +29,10 @@ df_new$weekYear = paste(df_new$Year,df_new$Week,sep="-")
 #summing days to weekly data
 cust = data.frame(date = df_new$Date, year = df_new$Year, week = df_new$Week, day = df_new$Weekday, weekyear = df_new$weekYear, count = df_new$Cust...TOTAL)
 cust_agg1 = aggregate(formula = count ~ weekyear, data = cust, FUN="sum", na.action=na.omit) #na.pass if you like to NA the whole week
-cust_agg2 = aggregate(formula = cbind(week,year, date) ~ weekyear, data = cust,FUN="mean")
+cust_agg2 = aggregate(formula = cbind(week,year, date) ~ weekyear, data = cust,FUN="max")
 cust_weekly = merge(cust_agg1,cust_agg2, by="weekyear")
+cust_weekly$date=as.Date(cust_weekly$date)
+
 
 #removing na values
 #cust_weekly = cust_weekly[!is.na(cust_weekly$count),]

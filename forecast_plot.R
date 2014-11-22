@@ -31,25 +31,6 @@ BATSModel = function(series) {
   return(result)
 }
 
-model_accuracy = function(model_name, training_start, training_end, nforecast) {
-  training_start = as.Date(training_start)
-  training_end = as.Date(training_end)
-  data = cust_weekly_filtered[cust_weekly_filtered$date<=training_end,]
-  data = data[data$date>=training_start,]
-  fit = do.call(model_name,args=list(ts(data$count, frequency = 52)))
-  fcast_fit = forecast(fit, h=nforecast)
-  fcast = c(fcast_fit$mean)
-  test = cust_weekly_filtered[cust_weekly_filtered$date>training_end,]
-  test = test[1:nforecast,]
-  diff = test$count - fcast
-  diff = diff %*% diff
-  return(diff[1,1])
-}
-
-print(model_accuracy("stlm", "2008-01-01", "2014-07-01", 12))
-print(model_accuracy("HoltWinters", "2008-01-01", "2014-07-01", 12))
-print(model_accuracy("bats", "2008-01-01", "2014-07-01", 12))
-
 plot_model=function (model_name, start, middle, end) {
   start = as.Date(start)
   middle = as.Date(middle)
