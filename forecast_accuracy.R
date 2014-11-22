@@ -3,12 +3,12 @@ source("run.R",chdir=T)
 model_accuracy = function(model_name, data, training_start, training_end, frequency, nforecast) {
   training_start = as.Date(training_start)
   training_end = as.Date(training_end)
-  data = data[data$date<=training_end,]
-  data = data[data$date>=training_start,]
-  fit = do.call(model_name,args=list(ts(data$count, frequency = frequency)))
+  data_tr = data[data$date<=training_end,]
+  data_tr = data_tr[data_tr$date>=training_start,]
+  fit = do.call(model_name,args=list(ts(data_tr$count, frequency = frequency)))
   fcast_fit = forecast(fit, h=nforecast)
   fcast = c(fcast_fit$mean)
-  test = cust_weekly_filtered[cust_weekly_filtered$date>training_end,]
+  test = data[data$date>training_end,]
   test = test[1:nforecast,]
   diff = test$count - fcast
   diff = diff %*% diff
@@ -30,7 +30,15 @@ weekly_params = function() {
   return(result)
 }
 
-params = weekly_params()
+daily_params = function() {
+  result = list(frequency = 6, nforecast = 14, data = cust,
+                dates = c("2014-01-01","2014-02-13","2014-02-28","2014-04-10","2014-05-01","2014-06-25", "2014-07-01", "2014-07-15", "2014-08-07","2014-09-21","2014-10-15"))
+  return(result)
+}
+
+
+#params = weekly_params()
+params = daily_params()
 print(make_test("stlm", params$data, params$dates, params$frequency, params$nforecast))
 print(make_test("HoltWinters", params$data, params$dates, params$frequency, params$nforecast))
 print(make_test("bats", params$data, params$dates, params$frequency, params$nforecast))

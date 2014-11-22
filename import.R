@@ -22,12 +22,11 @@ df_new = do.call("rbind",df_by_year)
 df_new$Year = as.numeric(df_new$Year)
 df_new$weekYear = paste(df_new$Year,df_new$Week,sep="-")
 
-#assigning NA where daily sales are 0
-
-#df_new$Cust...TOTAL[df_new$Cust...TOTAL==0] = NA #if you like to use NA instead of 0
+#making clean data frame, removing Sundays as they contain totals for a week
+cust = data.frame(date = df_new$Date, year = df_new$Year, week = df_new$Week, day = df_new$Weekday, weekyear = df_new$weekYear, count = df_new$Cust...TOTAL)
+cust = cust[cust$day!=6,]
 
 #summing days to weekly data
-cust = data.frame(date = df_new$Date, year = df_new$Year, week = df_new$Week, day = df_new$Weekday, weekyear = df_new$weekYear, count = df_new$Cust...TOTAL)
 cust_agg1 = aggregate(formula = count ~ weekyear, data = cust, FUN="sum", na.action=na.omit) #na.pass if you like to NA the whole week
 cust_agg2 = aggregate(formula = cbind(week,year, date) ~ weekyear, data = cust,FUN="max")
 cust_weekly = merge(cust_agg1,cust_agg2, by="weekyear")
