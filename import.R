@@ -32,7 +32,10 @@ cust_agg1 = aggregate(formula = count ~ weekyear, data = cust, FUN="sum", na.act
 cust_agg2 = aggregate(formula = cbind(week,year, date) ~ weekyear, data = cust,FUN="max")
 cust_weekly = merge(cust_agg1,cust_agg2, by="weekyear")
 cust_weekly$date=as.Date(cust_weekly$date)
+cust_weekly=cust_weekly[cust_weekly$week!=53,]
 
-
-#removing na values
-#cust_weekly = cust_weekly[!is.na(cust_weekly$count),]
+#filling zeros and na's with means
+#empirically this is better than removing and keeping these values
+mean_count = mean(cust_weekly$count)
+cust_weekly$count[cust_weekly$count==0]=mean_count
+cust_weekly$count[is.na(cust_weekly$count)]=mean_count

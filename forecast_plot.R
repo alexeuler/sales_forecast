@@ -1,8 +1,4 @@
 source("run.R",chdir=T)
-cust_weekly_filtered = cust_weekly[cust_weekly$week!=53,]
-
-
-
 
 ts_to_frame = function(series,name="values", frequency = 1) {
   frame=data.frame(time=round((time(series)-1)*frequency))
@@ -36,12 +32,12 @@ plot_model=function (model_name, start, middle, end) {
   middle = as.Date(middle)
   end = as.Date(end)
   data = list()
-  weekly_training = cust_weekly_filtered[cust_weekly_filtered$date<middle,]
+  weekly_training = cust_weekly[cust_weekly$date<middle,]
   weekly_training = weekly_training[weekly_training$date>=start,]
   data$training = data.frame(actual = weekly_training$count,
                              date = weekly_training$date)
   data$training$time=time(ts(data$training$actual))
-  weekly_test = cust_weekly_filtered[cust_weekly_filtered$date>=middle,]
+  weekly_test = cust_weekly[cust_weekly$date>=middle,]
   weekly_test = weekly_test[weekly_test$date<=end,]
   
   data$test=data.frame(actual = weekly_test$count,
@@ -64,4 +60,4 @@ plot_model=function (model_name, start, middle, end) {
 }
 
 
-plot_model("BATSModel", "2008-01-01", "2014-07-01", "2014-10-01")
+plot_model("HWModel", "2008-01-01", "2014-07-01", "2014-10-01")
