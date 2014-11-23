@@ -6,5 +6,6 @@ use = function(lib_name) {
 
 use("ggplot2")
 use("forecast")
+use("reshape")
 options(java.parameters = "-Xmx4g" )
 use("XLConnect")

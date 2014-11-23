@@ -7,7 +7,7 @@ df=df[df$Year>2007,]
 
 #Remove future zeros
 non_zeros = df[df$Cust...TOTAL!=0,]
-last_date = tail(non_zeros, n = 1)$Date
+last_date = tail(non_zeros, n = 1)$Date - 3
 df=df[df$Date<=last_date,]
 
 #adding week number starting the first day of the year
