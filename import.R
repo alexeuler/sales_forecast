@@ -1,5 +1,5 @@
 df = readWorksheetFromFile(file = "Shop Figures v8.xlsx", sheet = "Takings", endCol = 13)
-df$Date = as.Date(df$Date + 3600) #This is weird - the date from excel is read as previous day 23:00, to fix that we add 3 600 sec
+df$Date = as.Date(df$Date) + 1 #This is weird - the date from excel is read as previous day 23:00, to fix that we add 3 600 sec
 df$Weekday = strftime(df$Date,'%w')
 df$Year = strftime(df$Date,'%Y')
 #Year 2007 is incomplete
@@ -24,7 +24,11 @@ df_new$weekYear = paste(df_new$Year,df_new$Week,sep="-")
 
 #making clean data frame, removing Sundays as they contain totals for a week
 cust = data.frame(date = df_new$Date, year = df_new$Year, week = df_new$Week, day = df_new$Weekday, weekyear = df_new$weekYear, count = df_new$Cust...TOTAL)
-cust = cust[cust$day!=6,]
+cust = cust[cust$day!=0,]
+
+#adding UK week, e.g. first monday of the year is the first week
+cust$uk_week = strftime(cust$date, "%W")
+cust$uk_weekyear = paste(cust$year,cust$uk_week,sep="-")
 
 #summing days to weekly data
 cust_agg1 = aggregate(formula = count ~ weekyear, data = cust, FUN="sum", na.action=na.omit) #na.pass if you like to NA the whole week
@@ -38,3 +42,6 @@ cust_weekly=cust_weekly[cust_weekly$week!=53,]
 mean_count = mean(cust_weekly$count)
 cust_weekly$count[cust_weekly$count==0]=mean_count
 cust_weekly$count[is.na(cust_weekly$count)]=mean_count
+
+#cleaning up
+rm(df_by_year, non_zeros, cust_agg1, cust_agg2, mean_count)
