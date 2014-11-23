@@ -47,5 +47,6 @@ weekly_plot = function(data, title = element_blank()) {
 weekly_forecast = close_forecast(cust, "count")
 current_week_customers_plot = weekly_plot(weekly_forecast$current_week, "Customers")
 next_week_customers_plot = weekly_plot(weekly_forecast$next_week, "Customers")
+multiplot(current_week_customers_plot)
 #multiplot(weekly_plot(weekly_forecast$current_week, "Customers"),
 #          weekly_plot(weekly_forecast$next_week))
