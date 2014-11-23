@@ -67,7 +67,13 @@ current_week_plot = list(
   spend = weekly_plot(daily_forecast_spend$current_week, "Average ticket"),
   revenue = weekly_plot(daily_forecast_revenue$current_week, "Total income"))
 
-make_slide(current_week_plot)
+next_week_plot = list(
+  count = weekly_plot(daily_forecast_count$next_week, "Customers"),
+  spend = weekly_plot(daily_forecast_spend$next_week, "Average ticket"),
+  revenue = weekly_plot(daily_forecast_revenue$next_week, "Total income"))
+
+
+make_slide(next_week_plot)
 #multiplot(current_week_plot$count, current_week_plot$spend, current_week_plot$revenue, cols = 2)
 
 #current_week_customers_plot = weekly_plot(weekly_forecast$current_week, "Customers")
