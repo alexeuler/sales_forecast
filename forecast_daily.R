@@ -1,6 +1,4 @@
-source("run.R",chdir=T)
-
-close_forecast = function (data, field, method) {
+forecast_daily = function (data, field, method) {
   #preparing current_week_data frame
   last_day = tail(data, 1)$date
   last_uk_week = tail(data, 1)$uk_week
@@ -31,53 +29,6 @@ close_forecast = function (data, field, method) {
   first_day_of_the_next_week = tail(current_week_data$date,1)+2
   next_week_data = data.frame(date = seq(first_day_of_the_next_week, length.out = 6, by = 1))
   next_week_data = merge(next_week_data, two_week_fcast, by="date", all.x=T)
-  result = list(current_week=current_week_data, next_week = next_week_data)
+  result = list(currentf=current_week_data, nextf = next_week_data)
   return(result)
 }
-
-weekly_plot = function(data, title = element_blank()) {
-  data.m = melt(data,id="date")
-  p = ggplot(data.m, aes(x = strftime(date,"%Y-%m-%d"), y=value, label = value)) + 
-    geom_bar(aes(fill = variable), position = "dodge", stat="identity") +
-    theme(axis.title.x=element_blank(),axis.title.y=element_blank()) +
-    ggtitle(title)
-  return(p)
-}
-
-daily_forecast_count = close_forecast(cust, "count", "HoltWinters")
-daily_forecast_spend = close_forecast(cust, "spend", "HoltWinters")
-daily_forecast_revenue = list()
-daily_forecast_revenue$current_week = data.frame(
-  date = daily_forecast_spend$current_week$date,
-  actual = daily_forecast_spend$current_week$actual * daily_forecast_count$current_week$actual,
-  initial_forecast = daily_forecast_spend$current_week$initial_forecast * daily_forecast_count$current_week$initial_forecast,
-  forecast = daily_forecast_spend$current_week$forecast * daily_forecast_count$current_week$forecast
-  )
-daily_forecast_revenue$next_week = data.frame(
-  date = daily_forecast_spend$next_week$date,
-  forecast = daily_forecast_spend$next_week$forecast * daily_forecast_count$next_week$forecast
-)
-
-make_slide = function(data) {
-  multiplot(data$count, data$spend, data$revenue, cols = 2)
-}
-
-current_week_plot = list(
-  count = weekly_plot(daily_forecast_count$current_week, "Customers"),
-  spend = weekly_plot(daily_forecast_spend$current_week, "Average ticket"),
-  revenue = weekly_plot(daily_forecast_revenue$current_week, "Total income"))
-
-next_week_plot = list(
-  count = weekly_plot(daily_forecast_count$next_week, "Customers"),
-  spend = weekly_plot(daily_forecast_spend$next_week, "Average ticket"),
-  revenue = weekly_plot(daily_forecast_revenue$next_week, "Total income"))
-
-
-make_slide(current_week_plot)
-multiplot(current_week_plot$count, current_week_plot$spend, current_week_plot$revenue, cols = 2)
-
-#current_week_customers_plot = weekly_plot(weekly_forecast$current_week, "Customers")
-#next_week_customers_plot = weekly_plot(weekly_forecast$next_week, "Customers")
-#multiplot(current_week_customers_plot)
-#multiplot(weekly_plot(weekly_forecast$current_week, "Customers"),
-#          weekly_plot(weekly_forecast$next_week))

@@ -1,11 +1,4 @@
-source("run.R",chdir=T)
-
-
-data = cust_weekly
-field = "count"
-method = "HoltWinters"
-
-quarter_forecast = function(data, field, method) {
+forecast_weekly = function(data, field, method) {
   last_week = as.numeric(tail(data, 1)$week)
   last_year = as.numeric(tail(data, 1)$year)
   last_weekyear = tail(data, 1)$weekyear
@@ -18,7 +11,7 @@ quarter_forecast = function(data, field, method) {
   names(current_quarter_data)[names(current_quarter_data)=="week.x"] = "week"
   names(current_quarter_data)[names(current_quarter_data)=="year.x"] = "year"
   current_quarter_data = current_quarter_data[,c("week","year", "weekyear", field)]
-  names(current_quarter_data)[names(current_quarter_data)=="count"] = "actual"
+  names(current_quarter_data)[names(current_quarter_data)==field] = "actual"
   data$weekyear = factor(data$weekyear, ordered = T)
   initial_data = data[data$weekyear<paste(last_year,first_week_of_the_last_quarter, sep="-"),]
   #making initial forecast
@@ -26,6 +19,7 @@ quarter_forecast = function(data, field, method) {
   fit_weekly = do.call(method, list(ts_weekly))
   fcast_weekly = forecast(fit_weekly, 13)
   current_quarter_data$initial_forecast = round(c(fcast_weekly$mean))
+  current_quarter_data$date = as.Date(paste(current_quarter_data$year,"01", "01", sep="-")) + (current_quarter_data$week - 1) * 7
   
   #making forecast
   data = data[1:(nrow(data)-1),] #removing last week as it is not full
@@ -51,4 +45,13 @@ quarter_forecast = function(data, field, method) {
   next_quarter_data$weekyear = paste(next_quarter_data$year, sprintf("%02d",next_quarter_data$week), sep="-")
   next_quarter_data$date = as.Date(paste(next_quarter_data$year,"01", "01", sep="-")) + (next_quarter_data$week - 1) * 7
   next_quarter_data = merge(next_quarter_data, two_quarter_fcast, by="weekyear")
+  
+  current_quarter_data = current_quarter_data[ , -which(names(current_quarter_data) %in% c("week","year", "weekyear"))]
+  next_quarter_data = next_quarter_data[ , -which(names(next_quarter_data) %in% c("week","year", "weekyear"))]
+  
+  #current_quarter_data = subset(current_quarter_data, select=-c("week", "year", "weekyear"))
+  #next_quarter_data = subset(next_quarter_data, select=-c("week", "year", "weekyear"))
+  
+  result = list(currentf=current_quarter_data, nextf = next_quarter_data)
+  return(result)
 }
