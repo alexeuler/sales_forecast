@@ -1,5 +1,5 @@
-df = readWorksheetFromFile(file = "Shop Figures v8.xlsx", sheet = "Takings", endCol = 13)
-df$Date = as.Date(df$Date) + 1 #This is weird - the date from excel is read as previous day 23:00, to fix that we add 3 600 sec
+df = readWorksheetFromFile(file = FILENAME, sheet = SHEETNAME, endCol = 13)
+df$Date = as.Date(df$Date) + 1 #This is weird - the date from excel is read as previous day 23:00, to fix that we add 1 day
 df$Weekday = strftime(df$Date,'%w')
 df$Year = strftime(df$Date,'%Y')
 #Year 2007 is incomplete
@@ -29,7 +29,10 @@ cust = data.frame(date = df_new$Date,
                   day = df_new$Weekday, 
                   weekyear = df_new$weekYear, 
                   count = df_new$Cust...TOTAL,
-                  revenue = df_new$Cash + as.numeric(gsub("[,]",".",gsub("[$]","",df_new$EFTPOS)))
+                  revenue = df_new$Cash + 
+                    #as.numeric(gsub("[,]",".",gsub("[$`]","",df_new$EFTPOS)))
+                    as.numeric(gsub("[,]","",gsub("[$`]","",df_new$EFTPOS)))
+                    
                   )
 cust$spend=cust$revenue / cust$count
 cust = cust[cust$day!=0,]

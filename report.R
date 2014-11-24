@@ -1,9 +1,7 @@
-source("run.R",chdir=T)
-
 report_plot = function(data, title = element_blank()) {
   data.m = melt(data,id="date")
   p = ggplot(data.m, aes(x = strftime(date,"%Y-%m-%d"), y=value, label = value)) + 
-    geom_bar(aes(fill = variable), position = "dodge", stat="identity") +
+    geom_bar(aes(fill = variable), color="black", position = "dodge", stat="identity") +
     theme(axis.title.x=element_blank(),axis.title.y=element_blank()) +
     ggtitle(title) + 
     theme(axis.text.x = element_text(angle = 90, hjust = 1))

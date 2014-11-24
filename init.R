@@ -1,4 +1,6 @@
-MODEL = "HoltWinters"
+MODEL = "bats" #bats, HoltWinters, stlm
+FILENAME="Shop Figures.xlsx"
+SHEETNAME="Takings"
 
 
 use = function(lib_name) {
