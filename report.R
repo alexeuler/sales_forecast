@@ -1,6 +1,6 @@
 source("run.R",chdir=T)
 
-weekly_plot = function(data, title = element_blank()) {
+report_plot = function(data, title = element_blank()) {
   data.m = melt(data,id="date")
   p = ggplot(data.m, aes(x = strftime(date,"%Y-%m-%d"), y=value, label = value)) + 
     geom_bar(aes(fill = variable), position = "dodge", stat="identity") +
@@ -8,10 +8,6 @@ weekly_plot = function(data, title = element_blank()) {
     ggtitle(title) + 
     theme(axis.text.x = element_text(angle = 90, hjust = 1))
   return(p)
-}
-
-make_slide = function(data) {
-  multiplot(data$count, data$spend, data$revenue, cols = 2)
 }
 
 make_forecast = function (data, time, period, model) {
@@ -23,29 +19,48 @@ make_forecast = function (data, time, period, model) {
     actual = forecast_spend$currentf$actual * forecast_count$currentf$actual,
     initial_forecast = forecast_spend$currentf$initial_forecast * forecast_count$currentf$initial_forecast,
     forecast = forecast_spend$currentf$forecast * forecast_count$currentf$forecast
-    )
+  )
   forecast_revenue$nextf = data.frame(
     date = forecast_spend$nextf$date,
     forecast = forecast_spend$nextf$forecast * forecast_count$nextf$forecast
   )
   return(list(
-    count = weekly_plot(forecast_count[[time]], "Customers"),
-    spend = weekly_plot(forecast_spend[[time]], "Average ticket"),
-    revenue = weekly_plot(forecast_revenue[[time]], "Total income")))
+    count = report_plot(forecast_count[[time]], "Customers"),
+    spend = report_plot(forecast_spend[[time]], "Average ticket"),
+    revenue = report_plot(forecast_revenue[[time]], "Total income")))
+}
+
+make_slide = function(data, title) {
+
+  df = data.frame()
+  title = ggplot(df) + geom_point() + 
+    xlim(0, 10) + 
+    ylim(0, 10) + 
+    theme_bw() + 
+    theme(axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.border = element_blank(),
+          panel.background = element_blank(),
+          plot.title = element_text(vjust=0.5)) +
+    annotate("text", x = 5, y = 5, label = title, size=15)
+  
+  grid.arrange(title, arrangeGrob(data$count, data$spend, ncol=2), data$revenue, heights = c(1,4,4))
+ 
 }
 
 
-#forecast_spend = do.call(paste("forecast","weekly", sep="_"), args = list(cust_weekly, "spend", "HoltWinters"))
-#forecast_count = do.call(paste("forecast","weekly", sep="_"), args = list(cust_weekly, "count", "HoltWinters"))
+current_week_plot = make_forecast(cust, "currentf", "daily", MODEL)
+next_week_plot = make_forecast(cust, "nextf", "daily", MODEL)
 
-current_week_plot = make_forecast(cust_weekly, "currentf", "weekly", "HoltWinters")
-#next_week_plot = make_forecast(cust_weekly, "nextf", "weekly", "HoltWinters")
+current_quarter_plot = make_forecast(cust_weekly, "currentf", "weekly", MODEL)
+next_quarter_plot = make_forecast(cust_weekly, "nextf", "weekly", MODEL)
 
-make_slide(current_week_plot)
-#multiplot(current_week_plot$count, current_week_plot$spend, current_week_plot$revenue, cols = 2)
-
-#current_week_customers_plot = weekly_plot(weekly_forecast$current_week, "Customers")
-#next_week_customers_plot = weekly_plot(weekly_forecast$next_week, "Customers")
-#multiplot(current_week_customers_plot)
-#multiplot(weekly_plot(weekly_forecast$current_week, "Customers"),
-#          weekly_plot(weekly_forecast$next_week))
+pdf("plots.pdf", onefile = TRUE, width = 16, height = 16 / 297 * 210)
+make_slide(current_week_plot, "Current Week")
+make_slide(next_week_plot, "Next Week")
+make_slide(current_quarter_plot, "Current Quarter")
+make_slide(next_quarter_plot, "Next Quarter")
+dev.off()

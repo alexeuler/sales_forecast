@@ -1,3 +1,6 @@
+MODEL = "HoltWinters"
+
+
 use = function(lib_name) {
   if (!is.element(lib_name, installed.packages()[,1]))
     install.packages(lib_name, dep = TRUE)
@@ -7,5 +10,6 @@ use = function(lib_name) {
 use("ggplot2")
 use("forecast")
 use("reshape")
+use("gridExtra")
 options(java.parameters = "-Xmx4g" )
 use("XLConnect")
