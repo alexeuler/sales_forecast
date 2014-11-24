@@ -7,7 +7,7 @@ df=df[df$Year>2007,]
 
 #Remove future zeros
 non_zeros = df[df$Cust...TOTAL!=0,]
-last_date = tail(non_zeros, n = 1)$Date - 3
+last_date = tail(non_zeros, n = 1)$Date
 df=df[df$Date<=last_date,]
 
 #adding week number starting the first day of the year
@@ -29,7 +29,7 @@ cust = data.frame(date = df_new$Date,
                   day = df_new$Weekday, 
                   weekyear = df_new$weekYear, 
                   count = df_new$Cust...TOTAL,
-                  revenue = df_new$Cash + as.numeric(gsub("[$]","",df_new$EFTPOS))
+                  revenue = df_new$Cash + as.numeric(gsub("[,]",".",gsub("[$]","",df_new$EFTPOS)))
                   )
 cust$spend=cust$revenue / cust$count
 cust = cust[cust$day!=0,]
